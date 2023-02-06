@@ -1,3 +1,0 @@
-# openvidu-basic-ruby
-
-Coming soon...

@@ -5,7 +5,9 @@ import React, { Component } from 'react';
 import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 
-const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
+const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://iamhyunjun.shop/';
+
+axios.defaults.withCredentials = true
 
 class App extends Component {
     constructor(props) {
