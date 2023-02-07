@@ -7,6 +7,7 @@ import UserVideoComponent from './UserVideoComponent';
 
 const APPLICATION_SERVER_URL = "https://iamhyunjun.shop:5000/";
 
+console.log('APPLICATION_SERVER_URL 3 : ' , APPLICATION_SERVER_URL)
 
 class App extends Component {
     constructor(props) {
