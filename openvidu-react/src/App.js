@@ -8,7 +8,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.APPLICATION_SERVER_URL = "https://iamhyunjun.shop:5000/";
-        console.log('APPLICATION_SERVER_URL 4 : ' , APPLICATION_SERVER_URL)
+        console.log('APPLICATION_SERVER_URL 4 : ' , this.APPLICATION_SERVER_URL)
         this.state = {
             mySessionId: 'SessionA',
             myUserName: 'OpenVidu_User_' + Math.floor(Math.random() * 100),
