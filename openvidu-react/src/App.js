@@ -5,11 +5,8 @@ import React, { Component } from 'react';
 import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 
-//const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://iamhyunjun.shop/';
-const APPLICATION_SERVER_URL = 'https://iamhyunjun.shop:5000';
-console.log('APPLICATION_SERVER_URL 2 : ' , APPLICATION_SERVER_URL)
-//https://cors-anywhere.herokuapp.com/
-axios.defaults.withCredentials = true
+const APPLICATION_SERVER_URL = "https://iamhyunjun.shop:5000/";
+
 
 class App extends Component {
     constructor(props) {
@@ -280,19 +277,18 @@ class App extends Component {
                                 onClick={this.leaveSession}
                                 value="Leave session"
                             />
-                            <input
-                                className="btn btn-large btn-success"
-                                type="button"
-                                id="buttonSwitchCamera"
-                                onClick={this.switchCamera}
-                                value="Switch Camera"
-                            />
                         </div>
 
                         {this.state.mainStreamManager !== undefined ? (
                             <div id="main-video" className="col-md-6">
                                 <UserVideoComponent streamManager={this.state.mainStreamManager} />
-
+                                <input
+                                    className="btn btn-large btn-success"
+                                    type="button"
+                                    id="buttonSwitchCamera"
+                                    onClick={this.switchCamera}
+                                    value="Switch Camera"
+                                />
                             </div>
                         ) : null}
                         <div id="video-container" className="col-md-6">
@@ -303,8 +299,7 @@ class App extends Component {
                                 </div>
                             ) : null}
                             {this.state.subscribers.map((sub, i) => (
-                                <div key={sub.id} className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
-                                    <span>{sub.id}</span>
+                                <div key={i} className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
                                     <UserVideoComponent streamManager={sub} />
                                 </div>
                             ))}
@@ -322,12 +317,12 @@ class App extends Component {
      * --------------------------------------------
      * The methods below request the creation of a Session and a Token to
      * your application server. This keeps your OpenVidu deployment secure.
-     *
+     * 
      * In this sample code, there is no user control at all. Anybody could
      * access your application server endpoints! In a real production
      * environment, your application server must identify the user to allow
      * access to the endpoints.
-     *
+     * 
      * Visit https://docs.openvidu.io/en/stable/application-server to learn
      * more about the integration of OpenVidu in your application server.
      */
@@ -337,20 +332,16 @@ class App extends Component {
     }
 
     async createSession(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions', { customSessionId: sessionId }, {
-            headers: { 'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': "*"},
+        const response = await axios.post(APPLICATION_SERVER_URL + 'api/sessions', { customSessionId: sessionId }, {
+            headers: { 'Content-Type': 'application/json', },
         });
-        console.log('post data : ', response)
         return response.data; // The sessionId
     }
 
     async createToken(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions/' + sessionId + '/connections', {}, {
-            headers: { 'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': "*"},
+        const response = await axios.post(APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections', {}, {
+            headers: { 'Content-Type': 'application/json', },
         });
-        console.log('post data 2 : ', response)
         return response.data; // The token
     }
 }
