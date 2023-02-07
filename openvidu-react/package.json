@@ -26,5 +26,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy": "https://iamhyunjun.shop:5000"
+  "proxy": "http://iamhyunjun.shop:5000"
 }
