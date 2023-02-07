@@ -7,6 +7,7 @@ import UserVideoComponent from './UserVideoComponent';
 
 //const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://iamhyunjun.shop/';
 const APPLICATION_SERVER_URL = 'https://iamhyunjun.shop';
+console.log('APPLICATION_SERVER_URL : ' , APPLICATION_SERVER_URL)
 //https://cors-anywhere.herokuapp.com/
 axios.defaults.withCredentials = true
 
