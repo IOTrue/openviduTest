@@ -6,7 +6,7 @@ import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 
 //const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://iamhyunjun.shop/';
-const APPLICATION_SERVER_URL = 'https://iamhyunjun.shop/';
+const APPLICATION_SERVER_URL = 'http://iamhyunjun.shop:4443/';
 
 axios.defaults.withCredentials = true
 
