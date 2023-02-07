@@ -6,7 +6,7 @@ import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 
 //const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://iamhyunjun.shop/';
-const APPLICATION_SERVER_URL = 'https://iamhyunjun.shop:4443';
+const APPLICATION_SERVER_URL = '';
 //https://cors-anywhere.herokuapp.com/
 axios.defaults.withCredentials = true
 
@@ -336,7 +336,7 @@ class App extends Component {
     }
 
     async createSession(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions', { customSessionId: sessionId }, {
+        const response = await axios.post('/api/sessions', { customSessionId: sessionId }, {
             headers: { 'Content-Type': 'application/json', 
             'Access-Control-Allow-Origin': "*",
                     'Access-Control-Allow-Methods': "GET,POST"},
@@ -346,7 +346,7 @@ class App extends Component {
     }
 
     async createToken(sessionId) {
-        const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions/' + sessionId + '/connections', {}, {
+        const response = await axios.post('/api/sessions/' + sessionId + '/connections', {}, {
             headers: { 'Content-Type': 'application/json', 
             'Access-Control-Allow-Origin': "*",
                     'Access-Control-Allow-Methods': "GET,POST"},
