@@ -339,8 +339,7 @@ class App extends Component {
     async createSession(sessionId) {
         const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions', { customSessionId: sessionId }, {
             headers: { 'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': "*",
-                    'Access-Control-Allow-Methods': "GET,POST"},
+            'Access-Control-Allow-Origin': "*"},
         });
         console.log('post data : ', response)
         return response.data; // The sessionId
@@ -349,8 +348,7 @@ class App extends Component {
     async createToken(sessionId) {
         const response = await axios.post(APPLICATION_SERVER_URL + '/api/sessions/' + sessionId + '/connections', {}, {
             headers: { 'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': "*",
-                    'Access-Control-Allow-Methods': "GET,POST"},
+            'Access-Control-Allow-Origin': "*"},
         });
         console.log('post data 2 : ', response)
         return response.data; // The token
