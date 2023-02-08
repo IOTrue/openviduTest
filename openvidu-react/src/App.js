@@ -5,7 +5,8 @@ import React, { Component } from 'react';
 import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 
-const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
+//const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
+APPLICATION_SERVER_URL = "https://iamhyunjun.shop:5000/"
 
 class App extends Component {
     constructor(props) {
