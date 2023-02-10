@@ -68,16 +68,16 @@ function Main () {
         }
     },[isPublisherAudio])
 
-    const onClickSubscriberAudioToggle=(subToken)=>{
-        const subTokenId = subToken
+    const onClickSubscriberAudioToggle=(connectionId)=>{
+        const subConnectionId = connectionId
         setIsSubscriberAudio(!isSubscriberAudio)
-        console.log('clientId ::::: ', subTokenId)
+        console.log('clientId ::::: ', subConnectionId)
         //console.log('onClickSubscriberAudioToggle subscribers subTokenId : ', subscribers.stream.connection.session.token)
         const subscriberFilter = subscribers.filter((sub)=>{
             console.log('filter sub : ', sub)
-            console.log('filter sub.stream.connection.session.token : ', sub.stream.connection.session.token)
-            console.log('filter subTokenId : ', subTokenId)
-            return sub.stream.connection.session.token === subTokenId
+            console.log('filter sub.stream.connection.session.token : ', sub.stream.connection.connectionId)
+            console.log('filter subTokenId : ', subConnectionId)
+            return sub.stream.connection.connectionId === subConnectionId
         })
         setNowSubscriber(subscriberFilter)
         //.stream.connection.session.token === subTokenId
@@ -95,14 +95,14 @@ function Main () {
     },[isSubscriberAudio])
 
 
-    const onClickSubscriberVideoToggle=(subToken)=>{
+    const onClickSubscriberVideoToggle=(connectionId)=>{
         
-        const subTokenId = subToken
+        const subConnectionId = connectionId
         setIsSubscriberVideo(!isSubscriberVideo)
         
         const subscriberFilter = subscribers.filter((sub)=>{
 
-            return sub.stream.connection.session.token === subTokenId
+            return sub.stream.connection.connectionId === subConnectionId
         })
         setNowSubscriber(subscriberFilter)
     }
@@ -398,8 +398,8 @@ function Main () {
                                     <span>{JSON.parse(sub.stream.connection.data).clientData} 님</span>
                                     <UserVideoComponent streamManager={sub} />
                                 </div>
-                                <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.session.token)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
-                                <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.session.token)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
+                                <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
+                                <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
                                 </>
                                 )
                             )}
