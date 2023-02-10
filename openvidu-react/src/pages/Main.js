@@ -25,6 +25,7 @@ function Main () {
     
     //오디오, 비디오 컨트롤
     const [isPublisherAudio, setIsPublisherAudio]=useState(true)
+    const [isPublisherVideo, setIsPublisherVideo]=useState(true)
     const [isSubscriberAudio, setIsSubscriberAudio]=useState(true)
     const [isSubscriberVideo, setIsSubscriberVideo]=useState(true)
     const [nowSubscriber, setNowSubscriber]=useState(null)
@@ -47,14 +48,19 @@ function Main () {
     const deleteSubscriber = (streamManager) => {
         console.log('streamManager :::::::: ', streamManager)
         let index = subscribers.indexOf(streamManager, 0);
+        console.log('❌ deleteSubscriber subscribers : ', subscribers)
+        console.log('deleteSubscriber subscribers length : ', subscribers.length)
         if (index > -1) {
             subscribers.splice(index, 1);
             setSubscribers(subscribers)
+            console.log('❌❌ deleteSubscriber subscribers : ', subscribers)
+            console.log('deleteSubscriber subscribers length 2222 : ', subscribers.length)
         }
+        subscribers.length === 0 && setSubscribers([])
     }
 
 
-    /*오디오 컨트롤*/
+    /*게시자 디바이스 컨트롤*/
 
     const onClickPublisherAudioToggle=()=>{
         setIsPublisherAudio(!isPublisherAudio)
@@ -67,6 +73,19 @@ function Main () {
             publisher.publishAudio(isPublisherAudio)
         }
     },[isPublisherAudio])
+
+
+    const onClickPublisherVideoToggle=()=>{
+        setIsPublisherVideo(!isPublisherVideo)
+    }
+
+    useEffect(()=>{
+        if(publisher){
+            publisher.publishVideo(isPublisherVideo)
+        }
+    },[isPublisherVideo])
+
+    /*참여자 디바이스 컨트롤*/
 
     const onClickSubscriberAudioToggle=(connectionId)=>{
         const subConnectionId = connectionId
@@ -87,7 +106,7 @@ function Main () {
     useEffect(()=>{
         console.log('onClickSubscriberAudioToggle : ', isSubscriberAudio)
         console.log('❗ nowSubscriber : ', nowSubscriber)
-        if(nowSubscriber){
+        if(nowSubscriber && nowSubscriber.length>0){
             const subscriber = nowSubscriber
             subscriber[0].subscribeToAudio(isSubscriberAudio)
             return console.log('onClickSubscriberAudioToggle nowSubscriber 22222 : ', subscriber)
@@ -110,7 +129,7 @@ function Main () {
     useEffect(()=>{
         console.log('onClickSubscriberVVVVideoToggle : ', isSubscriberVideo)
         console.log('❗ nowSubscriber : ', nowSubscriber)
-        if(nowSubscriber){
+        if(nowSubscriber && nowSubscriber.length>0){
             const subscriber = nowSubscriber
             subscriber[0].subscribeToVideo(isSubscriberVideo)
             return console.log('onClickSubscriberVVVVideoToggle nowSubscriber 22222 : ', subscriber)
@@ -176,17 +195,23 @@ function Main () {
             // Subscribe to the Stream to receive it. Second parameter is undefined
             // so OpenVidu doesn't create an HTML video by its own
 
-
+            console.log('subscribers 확인 처음!@@ subscribers ::: ', subscribers)
             const newSubscriber = mySession.subscribe(event.stream, undefined);
             console.log('입장 아이디 : ', event.stream.connection.connectionId)
+            console.log('subscribers 확인 처음! subscribers ::: ', subscribers)
             const newSubscribers = subscribers
             newSubscribers.push(newSubscriber)
             setSubscribers([...newSubscribers])
-            console.log('subscribers !#!## ::: ', subscribers)
+            console.log('subscribers 확인 1 newSubscriber ::: ', newSubscriber)
+            console.log('subscribers 확인 2 newSubscribers ::: ', newSubscribers)
+            console.log('subscribers 확인 3 subscribers ::: ', subscribers)
         });
         // On every Stream destroyed...
         mySession.on('streamDestroyed', (event) => {
+            console.log(' streamDestroyed event : ' , event)
+            console.log(' streamDestroyed subscribers 1 : ' , subscribers)
             deleteSubscriber(event.stream.streamManager);
+            console.log(' streamDestroyed subscribers 2 : ' , subscribers)
             console.log('event.stream.typeOfVideo !@!@!@!@ : ' , event.stream)
             console.log('퇴장 @@@ : ', event.stream.connection.connectionId)
             //deleteSubscriber(event.stream.connection.connectionId);
@@ -375,6 +400,7 @@ function Main () {
                         {mainStreamManager !== undefined ? (
                             <div id="main-video" className="col-md-6">
                                 <UserVideoComponent streamManager={mainStreamManager} />
+                                <button onClick={onClickPublisherVideoToggle}>내 비디오 {isPublisherAudio}</button>
                                 <button onClick={onClickPublisherAudioToggle}>내 오디오 {isPublisherAudio}</button>
                             </div>
                         ) : null}
@@ -389,7 +415,10 @@ function Main () {
                                 </div>
                                 </>
                             ) : null}
-                            {subscribers?.map((sub, i) => 
+                            {subscribers.length>0
+                            ?
+                                
+                                subscribers?.map((sub, i) => 
                                 (
                                 <>
                                     {console.log('맵 sub id @@@@@@', `${sub.stream.session.options.sessionId + Date.now() + Math.floor(Math.random() * 100)}`)}
@@ -398,11 +427,14 @@ function Main () {
                                     <span>{JSON.parse(sub.stream.connection.data).clientData} 님</span>
                                     <UserVideoComponent streamManager={sub} />
                                 </div>
-                                <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
                                 <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
+                                <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
                                 </>
-                                )
-                            )}
+                                
+                            )
+                            )
+                            : null
+                            }
                         </div>
                     </div>
 
