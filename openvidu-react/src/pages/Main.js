@@ -22,14 +22,18 @@ function Main () {
     const [publisher, setPublisher] = useState(null)
     const [mainStreamManager, setMainStreamManager] = useState(undefined) // Main video of the page. Will be the 'publisher' or one of the 'subscribers'
     const [currentVideoDevice, setCurrentVideoDevice]=useState(undefined)
-    
+    const [publisherConnectionId, setPublisherConnectionId]=useState(undefined)
+
     //오디오, 비디오 컨트롤
     const [isPublisherAudio, setIsPublisherAudio]=useState(true)
     const [isPublisherVideo, setIsPublisherVideo]=useState(true)
     const [isSubscriberAudio, setIsSubscriberAudio]=useState(true)
     const [isSubscriberVideo, setIsSubscriberVideo]=useState(true)
     const [nowSubscriber, setNowSubscriber]=useState(null)
-    
+    const [isPublisherSpeaker, setIsPublisherSpeaker]=useState(false) //음성 감지 상태 - 게시자
+    const [isSubscriberSpeaker, setIsSubscriberSpeaker]=useState(false) //음성 감지 상태 - 참여자
+    const [subscriberSpeakerConnectionId, setSubscriberSpeakerConnectionId]=useState(undefined)
+
 
     useEffect(()=>{
         window.addEventListener('beforeunload', onbeforeunload);
@@ -176,8 +180,30 @@ function Main () {
     }
 
 
+    useEffect(()=>{
+        const mySession = session
+        if(mySession){
+            mySession.on('publisherStartSpeaking', (event) => { //음성감지 음성 시작
+                const speakerId = event.connection.connectionId
+                console.log('User start ' + JSON.parse(event.connection.data).clientData);
+                console.log('User ' + event.connection.connectionId + ' start speaking');
+                console.log('게시자 : ', publisherConnectionId)
+                console.log('참여자 : ', event.connection.connectionId)
+                speakerId === publisherConnectionId ? setIsPublisherSpeaker(true) : setSubscriberSpeakerConnectionId(speakerId)
+            });
+            
+            mySession.on('publisherStopSpeaking', (event) => { //음성감지 음성 종료
+                const speakerId = event.connection.connectionId
+                console.log('User stop ' + JSON.parse(event.connection.data).clientData);
+                console.log('User ' + event.connection.connectionId + ' stop speaking');
+                console.log('게시자 : ', publisherConnectionId)
+                console.log('참여자 : ', event.connection.connectionId)
+                speakerId === publisherConnectionId ? setIsPublisherSpeaker(false) : setSubscriberSpeakerConnectionId(undefined)
+            });
+        }
+    },[publisherConnectionId])
     
-    
+
     const joinSession = (e) => {
         e.preventDefault()
         
@@ -253,6 +279,7 @@ function Main () {
                         mirror: true, // Whether to mirror your local video or not
                         }
                     );
+                    console.log('publisher 확인하기! : ', publisher)
                     publisher.once('accessAllowed', async () => {
                         mySession.publish(publisher);
                         const devices = await OV.getDevices()
@@ -266,9 +293,20 @@ function Main () {
                         setCurrentVideoDevice(currentVideoDevice)
                         setPublisher(publisher);
                         setMainStreamManager(publisher)
+                        setPublisherConnectionId(publisher.stream.connection.connectionId)
                     });
                     })
 
+                    /*음성 감지 컨트롤*/
+
+                    OV.setAdvancedConfiguration({
+                        publisherSpeakingEventsOptions: {
+                            interval: 100,   // Frequency of the polling of audio streams in ms (default 100)
+                            threshold: -50  // Threshold volume in dB (default -50)
+                        }
+                    });
+
+                   
                     
                 })
                 .catch((error) => {
@@ -408,11 +446,22 @@ function Main () {
                             {publisher !== undefined ? (
                                 <>
                                 {console.log('publisher 😎 # ',publisher)}
-                                <div className="stream-container col-md-6 col-xs-6" onClick={() => handleMainVideoStream(publisher)}>
-                                    <span>(나)</span>
-                                    <UserVideoComponent
-                                        streamManager={publisher} />
-                                </div>
+                                {isPublisherSpeaker 
+                                ? <>
+                                    <div className="stream-container col-md-6 col-xs-6 isSpeaker" onClick={() => handleMainVideoStream(publisher)}>
+                                        <span>(나)</span>
+                                        <UserVideoComponent streamManager={publisher} />
+                                    </div>
+                                </>
+
+                                : <>
+                                
+                                    <div className="stream-container col-md-6 col-xs-6" onClick={() => handleMainVideoStream(publisher)}>
+                                        <span>(나)</span>
+                                        <UserVideoComponent streamManager={publisher} />
+                                    </div>
+                                </>
+                                }
                                 </>
                             ) : null}
                             {subscribers.length>0
@@ -420,36 +469,35 @@ function Main () {
                                 
                                 subscribers?.map((sub, i) => 
                                 (
-                                <>
-                                    {console.log('맵 sub id @@@@@@', `${sub.stream.session.options.sessionId + Date.now() + Math.floor(Math.random() * 100)}`)}
-                                    {console.log('맵 sub # ',JSON.parse(sub.stream.connection.data).clientData)}
-                                <div key={sub.id} className="stream-container col-md-6 col-xs-6" onClick={() => handleMainVideoStream(sub)}>
-                                    <span>{JSON.parse(sub.stream.connection.data).clientData} 님</span>
-                                    <UserVideoComponent streamManager={sub} />
-                                </div>
-                                <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
-                                <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
-                                </>
+                                    subscriberSpeakerConnectionId ===  sub.stream.connection.connectionId
+                                    ? <>
+                                        <div key={sub.id} className="stream-container col-md-6 col-xs-6 isSpeaker" onClick={() => handleMainVideoStream(sub)}>
+                                            <span>{JSON.parse(sub.stream.connection.data).clientData} 님</span>
+                                            <UserVideoComponent streamManager={sub} />
+                                        </div>
+                                        <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
+                                        <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
+                                    </>
+                                    : <>
+                                        <div key={sub.id} className="stream-container col-md-6 col-xs-6" onClick={() => handleMainVideoStream(sub)}>
+                                            <span>{JSON.parse(sub.stream.connection.data).clientData} 님</span>
+                                            <UserVideoComponent streamManager={sub} />
+                                        </div>
+                                        <button onClick={()=>{onClickSubscriberVideoToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 비디오 {isSubscriberAudio}</button>
+                                        <button onClick={()=>{onClickSubscriberAudioToggle(sub.stream.connection.connectionId)}}>{JSON.parse(sub.stream.connection.data).clientData} 님 오디오 {isSubscriberAudio}</button>
+                                    </>
                                 
-                            )
+                                )
                             )
                             : null
                             }
                         </div>
                     </div>
-
-
-
-
-
-
-
-
-                    {/* canvas
-                        <CanvasTest/>
-                    */}
+                   
                     
-
+                    <div>
+                        {/* <CanvasTest/> */}
+                    </div>
 
                     </>
                 ) : null}

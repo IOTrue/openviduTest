@@ -1,3 +1,6 @@
 .stream-container {
 	padding: 0;
 }
+.isSpeaker{
+	border: 3px solid red;
+}
